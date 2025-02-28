@@ -1,4 +1,6 @@
 class CardsController < ApplicationController
+  include ActionView::RecordIdentifier
+
   def new
     @card = Card.new(board_column_id: params[:board_column_id])
   end
@@ -10,6 +12,12 @@ class CardsController < ApplicationController
       if service.call
         @card = service.card
         format.html { redirect_to board_url(@card.board), notice: "Card was successfully created." }
+        format.turbo_stream { render turbo_stream:
+                                       [
+                                         turbo_stream.append(dom_id(@card.board_column, :column_body), partial: "cards/card", object: @card ),
+                                         turbo_stream.replace(dom_id(@card.board_column, :new_card), partial: "board_columns/new_card", locals: {board_column: @card.board_column })
+                                       ]
+        }
       else
         @card = service.card
         format.html { render :new, status: :unprocessable_entity }
@@ -27,7 +35,7 @@ class CardsController < ApplicationController
 
     respond_to do |format|
       if service.call
-        format.html { redirect_to board_url(@card.board_column.board), notice: "Card was successfully updated." }
+        format.html { redirect_to board_url(@card.board), notice: "Card was successfully updated." }
       else
         format.html { render :edit, status: :unprocessable_entity }
       end
@@ -41,6 +49,7 @@ class CardsController < ApplicationController
 
     respond_to do |format|
       format.html { redirect_to board_url(board), notice: "Card was successfully destroyed." }
+      format.turbo_stream { render turbo_stream: turbo_stream.remove(@card) }
     end
   end
 
