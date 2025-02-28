@@ -1,4 +1,5 @@
 class BoardColumnsController < ApplicationController
+  include ActionView::RecordIdentifier
   def new
     @board = Board.find(params[:board_id])
     @board_column = @board.board_columns.new
@@ -40,6 +41,7 @@ class BoardColumnsController < ApplicationController
 
     respond_to do |format|
       format.html { redirect_to board_url(board), notice: "BoardColumn was successfully destroyed." }
+      format.turbo_stream { render turbo_stream: turbo_stream.remove(dom_id(@board_column, :column_body_delete)) }
     end
   end
 

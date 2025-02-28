@@ -22,6 +22,13 @@ class BoardsController < ApplicationController
     respond_to do |format|
       if @board.save
         format.html { redirect_to boards_url, notice: "Board was successfully created." }
+        format.turbo_stream { render turbo_stream:
+                                       [
+                                         turbo_stream.append("boards-list", partial: "boards/board", object: @board),
+                                         turbo_stream.replace("new_board", inline: "<%= link_to 'New Board', new_board_path, class: 'btn btn-outline-primary' %>")
+                                      ]
+        }
+        format.turbo_stream
       else
         format.html { render :new, status: :unprocessable_entity }
       end
@@ -43,6 +50,7 @@ class BoardsController < ApplicationController
 
     respond_to do |format|
       format.html { redirect_to boards_url, notice: "Board was successfully destroyed." }
+      format.turbo_stream { render turbo_stream: turbo_stream.remove(@board) }
     end
   end
 

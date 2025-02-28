@@ -1,21 +1,23 @@
-<div class="board-header w-100 px-3">
-  <div class="row">
-    <div class="d-flex justify-content-between">
-      <%= link_to 'Back to boards list', boards_path, class: 'text-primary-grey-600 ms-2' %>
-      <h1 class="text-primary-dark-500">
-        <%= @board.name %>
-      </h1>
-      <div>
-        <%= link_to 'New Column', new_board_board_column_path(@board), class: 'btn btn-outline-primary' %>
+  <div class="board-header w-100 px-3">
+    <div class="row">
+      <div class="d-flex justify-content-between">
+        <%= link_to 'Back to boards list', boards_path, class: 'text-primary-grey-600 ms-2', data: { turbo_frame: '_top' } %>
+        <h1 class="text-primary-dark-500">
+          <%= @board.name %>
+        </h1>
+        <%= turbo_frame_tag dom_id(@board) do %>
+          <div>
+            <%= link_to 'New Column', new_board_board_column_path(@board), class: 'btn btn-outline-primary' %>
+          </div>
+        <% end %>
       </div>
     </div>
   </div>
-</div>
 
-<div class="board-container">
-  <div class="board-scroll p-3" data-controller="sortable" data-sortable-group-value="<%= @board.id %>" data-sortable-url-value="<%= card_path(":id") %>">
-    <% @board_columns.each do |board_column| %>
-      <%= render partial: 'board_columns/board_column', locals: { board_column: board_column } %>
-    <% end %>
+  <div class="board-container">
+    <div class="board-scroll p-3" data-controller="sortable" data-sortable-group-value="<%= @board.id %>" data-sortable-url-value="<%= card_path(":id") %>">
+      <% @board_columns.each do |board_column| %>
+        <%= render partial: 'board_columns/board_column', locals: { board_column: board_column } %>
+      <% end %>
+    </div>
   </div>
-</div>
